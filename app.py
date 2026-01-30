@@ -50,21 +50,42 @@ REMOTE_HTML = """
 """
 
 def send_aquos_command(command, param):
-    cmd_full = f"{command:<4}{param:<4}\\r"
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(5.0)
-            s.connect((TV_IP, TV_PORT))
-            time.sleep(0.5)
-            s.sendall(f"{TV_ID}\\n".encode())
-            time.sleep(0.5)
-            s.sendall(f"{TV_PASS}\\n".encode())
-            time.sleep(0.5)
-            s.sendall(cmd_full.encode())
-            response = s.recv(1024).decode().strip()
-            return True, response
-    except Exception as e:
-        return False, str(e)
+    cmd_full = f"{command:<4}{param:<4}\r"
+    # リトライ回数を設定
+    for attempt in range(3):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(3.0) # タイムアウトを少し短くして回転を速める
+                s.connect((TV_IP, TV_PORT))
+                
+                # ログイン処理
+                time.sleep(0.2)
+                s.sendall(f"{TV_ID}\n".encode())
+                time.sleep(0.2)
+                s.sendall(f"{TV_PASS}\n".encode())
+                time.sleep(0.5) # 認証後の安定待ち
+
+                # 受信バッファを空にする（ゴミデータの掃除）
+                s.setblocking(False)
+                try:
+                    while s.recv(1024): pass
+                except:
+                    pass
+                s.setblocking(True)
+
+                # コマンド送信
+                s.sendall(cmd_full.encode())
+                response = s.recv(1024).decode().strip()
+                
+                # OKかERRが返ってくれば成功として終了
+                if response:
+                    return True, response
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            time.sleep(1.0) # 少し待ってからリトライ
+            continue
+            
+    return False, "Timeout after retries"
 
 @app.route('/')
 def index():
