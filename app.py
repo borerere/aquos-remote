@@ -24,12 +24,12 @@ REMOTE_HTML = """
         .section { margin-bottom: 20px; width: 100%; max-width: 400px; display: grid; gap: 10px; }
         .btn { padding: 18px 5px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; color: white; background: #333; transition: transform 0.1s; }
         .btn:active { transform: scale(0.95); opacity: 0.8; }
-        
-        /* 電源ボタンの色分け */
-        .pwr-on { background: #2ecc71; grid-column: span 1; } /* 緑 */
-        .pwr-off { background: #e74c3c; grid-column: span 1; } /* 赤 */
-        
+        .pwr-on { background: #2ecc71; }
+        .pwr-off { background: #e74c3c; }
+        /* カラーボタン */
         .blue { background: #2980b9; } .red { background: #c0392b; } .green { background: #27ae60; } .yellow { background: #f1c40f; color: black; }
+        /* dボタン（データ連動） */
+        .d-btn { background: #ffffff; color: #333; grid-column: span 4; margin-top: 5px; }
         .nav { background: #444; } .enter { background: #777; }
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
         .grid-4 { grid-template-columns: repeat(4, 1fr); }
@@ -47,11 +47,9 @@ REMOTE_HTML = """
 
     <div class="section grid-3">
         <script>
-            // チャンネル設定のマップ
             const channels = {
-                1: "011 ", 2: "021 ", 3: "031 ", 4: "041 ",
-                5: "051 ", 6: "061 ", 7: "071 ", 8: "081 ",
-                9: "091 ", 10: "101 ", 11: "111 ", 12: "121 "
+                1:"011 ", 2:"021 ", 3:"031 ", 4:"041 ", 5:"051 ", 6:"061 ",
+                7:"071 ", 8:"081 ", 9:"091 ", 10:"101 ", 11:"111 ", 12:"121 "
             };
             for(let i=1; i<=12; i++) {
                 document.write(`<button class="btn" onclick="send('CTBD', '${channels[i]}')">${i}</button>`);
@@ -59,38 +57,30 @@ REMOTE_HTML = """
         </script>
     </div>
 
-    <div class="section grid-3">
-        <button class="btn" onclick="send('RKEY', '33')">音量＋</button>
-        <button class="btn" onclick="send('RKEY', '32')">音量－</button>
-        <button class="btn" onclick="send('RKEY', '31')">消音</button>
-    </div>
-
-    <div class="section grid-3">
-        <div></div><button class="btn nav" onclick="send('RKEY', '41')">▲</button><div></div>
-        <button class="btn nav" onclick="send('RKEY', '44')">◀</button>
-        <button class="btn enter" onclick="send('RKEY', '40')">決定</button>
-        <button class="btn nav" onclick="send('RKEY', '43')">▶</button>
-        <div></div><button class="btn nav" onclick="send('RKEY', '42')">▼</button>
-        <button class="btn nav" onclick="send('RKEY', '45')">戻る</button>
-    </div>
-
     <div class="section grid-4">
         <button class="btn blue" onclick="send('RKEY', '52')">青</button>
         <button class="btn red" onclick="send('RKEY', '50')">赤</button>
         <button class="btn green" onclick="send('RKEY', '51')">緑</button>
         <button class="btn yellow" onclick="send('RKEY', '53')">黄</button>
+        <button class="btn d-btn" onclick="send('RKEY', '15')">d (データ連動)</button>
     </div>
 
     <div class="section grid-3">
-        <button class="btn" onclick="send('RKEY', '61')">戻る</button>
-        <button class="btn" onclick="send('RKEY', '60')">再生</button>
-        <button class="btn" onclick="send('RKEY', '62')">送り</button>
+        <button class="btn nav" onclick="send('RKEY', '45')">戻る</button>
+        <button class="btn nav" onclick="send('RKEY', '41')">▲</button>
+        <button class="btn" onclick="send('RKEY', '33')">音量＋</button>
+        <button class="btn nav" onclick="send('RKEY', '44')">◀</button>
+        <button class="btn enter" onclick="send('RKEY', '40')">決定</button>
+        <button class="btn nav" onclick="send('RKEY', '43')">▶</button>
+        <button class="btn" onclick="send('RKEY', '31')">消音</button>
+        <button class="btn nav" onclick="send('RKEY', '42')">▼</button>
+        <button class="btn" onclick="send('RKEY', '32')">音量－</button>
     </div>
 
     <script>
         function send(cmd, val) {
             const st = document.getElementById('status');
-            st.innerText = "Sending " + cmd + "...";
+            st.innerText = "Sending...";
             fetch(`/tv?cmd=${cmd}&val=${val}`)
                 .then(r => r.json())
                 .then(d => { st.innerText = d.status === "ok" ? "Success" : "Error"; })
