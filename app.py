@@ -32,8 +32,7 @@ REMOTE_HTML = """
     <h2>AQUOS Controller</h2>
     <button class="btn btn-pwr" onclick="send('POWR', '0')">Power OFF</button>
     <button class="btn btn-vol" onclick="send('VOLM', '15')">Volume 15</button>
-    <button class="btn btn-inp" onclick="send('IAV0', '4')">Input 4 (HDMI)</button>
-    <div id="status" style="margin-top: 20px; color: #666;"></div>
+<button class="btn btn-inp" onclick="send('IAVD', '4')">Input 4 (HDMI)</button>    <div id="status" style="margin-top: 20px; color: #666;"></div>
 
     <script>
         function send(cmd, val) {
