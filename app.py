@@ -93,17 +93,17 @@ REMOTE_HTML = """
 """
 
 def send_aquos_command(command, param):
-    # コマンド4文字 + パラメータ4文字 + CR の計9文字を生成
-    cmd_full = f"{command:<4}{param:<4}\\r"
+    # 【修正！】\\r を \r に、\\n を \n に戻します
+    cmd_full = f"{command:<4}{param:<4}\r" 
     for attempt in range(3):
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.settimeout(3.0)
                 s.connect((TV_IP, TV_PORT))
                 time.sleep(0.2)
-                s.sendall(f"{TV_ID}\\n".encode())
+                s.sendall(f"{TV_ID}\n".encode()) # ここも \n に修正
                 time.sleep(0.2)
-                s.sendall(f"{TV_PASS}\\n".encode())
+                s.sendall(f"{TV_PASS}\n".encode()) # ここも \n に修正
                 time.sleep(0.5)
                 
                 # バッファクリア
