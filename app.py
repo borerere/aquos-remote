@@ -24,7 +24,11 @@ REMOTE_HTML = """
         .section { margin-bottom: 20px; width: 100%; max-width: 400px; display: grid; gap: 10px; }
         .btn { padding: 18px 5px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; color: white; background: #333; transition: transform 0.1s; }
         .btn:active { transform: scale(0.95); opacity: 0.8; }
-        .pwr { background: #e74c3c; grid-column: span 3; }
+        
+        /* 電源ボタンの色分け */
+        .pwr-on { background: #2ecc71; grid-column: span 1; } /* 緑 */
+        .pwr-off { background: #e74c3c; grid-column: span 1; } /* 赤 */
+        
         .blue { background: #2980b9; } .red { background: #c0392b; } .green { background: #27ae60; } .yellow { background: #f1c40f; color: black; }
         .nav { background: #444; } .enter { background: #777; }
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
@@ -36,9 +40,9 @@ REMOTE_HTML = """
     <div class="status-bar" id="status">Ready</div>
 
     <div class="section grid-3">
-        <button class="btn pwr" onclick="send('POWR', '0')">電源 OFF</button>
-        <button class="btn" onclick="send('IAVD', '4')">入力 4 (PC)</button>
-        <button class="btn" onclick="send('ITVD', '0')">地デジ</button>
+        <button class="btn pwr-on" onclick="send('POWR', '1')">電源 ON</button>
+        <button class="btn pwr-off" onclick="send('POWR', '0')">電源 OFF</button>
+        <button class="btn" onclick="send('IAVD', '4')">入力 4</button>
     </div>
 
     <div class="section grid-3">
