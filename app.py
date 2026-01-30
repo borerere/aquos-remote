@@ -47,9 +47,14 @@ REMOTE_HTML = """
 
     <div class="section grid-3">
         <script>
+            // チャンネル設定のマップ
+            const channels = {
+                1: "011 ", 2: "021 ", 3: "031 ", 4: "041 ",
+                5: "051 ", 6: "061 ", 7: "071 ", 8: "081 ",
+                9: "091 ", 10: "101 ", 11: "111 ", 12: "121 "
+            };
             for(let i=1; i<=12; i++) {
-                let ch = ("0" + i).slice(-2); 
-                document.write(`<button class="btn" onclick="send('CTBD', '0${ch} ')">${i}</button>`);
+                document.write(`<button class="btn" onclick="send('CTBD', '${channels[i]}')">${i}</button>`);
             }
         </script>
     </div>
