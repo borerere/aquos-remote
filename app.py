@@ -14,34 +14,88 @@ TV_PASS = os.getenv("TV_PASS", "password")
 # シンプルなリモコンUI（HTML/CSS/JS）
 REMOTE_HTML = """
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQUOS Remote</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>AQUOS Full Remote</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background: #f0f0f0; }
-        .btn { width: 150px; padding: 15px; margin: 10px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; color: white; transition: 0.2s; }
-        .btn-pwr { background: #e74c3c; }
-        .btn-vol { background: #3498db; }
-        .btn-inp { background: #f1c40f; color: black; }
+        body { font-family: -apple-system, sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; touch-action: manipulation; }
+        .section { margin-bottom: 20px; width: 100%; max-width: 400px; display: grid; gap: 10px; }
+        
+        /* ボタン基本スタイル */
+        .btn { padding: 20px 10px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; color: white; background: #333; transition: transform 0.1s; }
         .btn:active { transform: scale(0.95); opacity: 0.8; }
+
+        /* 特殊ボタン色 */
+        .pwr { background: #e74c3c; grid-column: span 3; }
+        .blue { background: #2980b9; } .red { background: #c0392b; } .green { background: #27ae60; } .yellow { background: #f1c40f; color: black; }
+        .nav { background: #555; } .enter { background: #888; }
+        
+        /* グリッド構成 */
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        
+        .status-bar { height: 30px; color: #888; font-size: 14px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <h2>AQUOS Controller</h2>
-    <button class="btn btn-pwr" onclick="send('POWR', '0')">Power OFF</button>
-    <button class="btn btn-vol" onclick="send('VOLM', '15')">Volume 15</button>
-<button class="btn btn-inp" onclick="send('IAVD', '4')">Input 4 (HDMI)</button>    <div id="status" style="margin-top: 20px; color: #666;"></div>
+    <div class="status-bar" id="status">AQUOS Remote Connected</div>
+
+    <div class="section grid-3">
+        <button class="btn pwr" onclick="send('POWR', '0')">電源 OFF</button>
+        <button class="btn" onclick="send('IAVD', '4')">入力 4</button>
+        <button class="btn" onclick="send('ITVD', '0')">地デジ</button>
+        <button class="btn" onclick="send('RCNO', '34')">入力切換</button>
+    </div>
+
+    <div class="section grid-3">
+        <script>
+            for(let i=1; i<=12; i++) {
+                document.write(`<button class="btn" onclick="send('RCNO', '${100+i}')">${i}</button>`);
+            }
+        </script>
+    </div>
+
+    <div class="section grid-3">
+        <button class="btn" onclick="send('RCNO', '32')">音量＋</button>
+        <button class="btn" onclick="send('RCNO', '33')">音量－</button>
+        <button class="btn" onclick="send('RCNO', '31')">消音</button>
+    </div>
+
+    <div class="section grid-3">
+        <div></div><button class="btn nav" onclick="send('RCNO', '41')">▲</button><div></div>
+        <button class="btn nav" onclick="send('RCNO', '44')">◀</button>
+        <button class="btn enter" onclick="send('RCNO', '40')">決定</button>
+        <button class="btn nav" onclick="send('RCNO', '43')">▶</button>
+        <div></div><button class="btn nav" onclick="send('RCNO', '42')">▼</button>
+        <button class="btn nav" onclick="send('RCNO', '45')">戻る</button>
+    </div>
+
+    <div class="section grid-4">
+        <button class="btn blue" onclick="send('RCNO', '56')">青</button>
+        <button class="btn red" onclick="send('RCNO', '57')">赤</button>
+        <button class="btn green" onclick="send('RCNO', '58')">緑</button>
+        <button class="btn yellow" onclick="send('RCNO', '59')">黄</button>
+    </div>
+
+    <div class="section grid-3">
+        <button class="btn" onclick="send('RCNO', '61')">◀◀ 戻る</button>
+        <button class="btn" onclick="send('RCNO', '60')">再生</button>
+        <button class="btn" onclick="send('RCNO', '62')">送り ▶▶</button>
+        <button class="btn" onclick="send('RCNO', '63')">一時停止</button>
+        <button class="btn" onclick="send('RCNO', '64')">停止</button>
+    </div>
 
     <script>
         function send(cmd, val) {
-            const status = document.getElementById('status');
-            status.innerText = "Sending...";
+            const st = document.getElementById('status');
+            st.innerText = "Sending...";
             fetch(`/tv?cmd=${cmd}&val=${val}`)
                 .then(r => r.json())
-                .then(data => { status.innerText = "Result: " + data.status; })
-                .catch(e => { status.innerText = "Error: " + e; });
+                .then(d => { st.innerText = d.status === "ok" ? "Success" : "Error"; })
+                .catch(e => { st.innerText = "Failed"; });
         }
     </script>
 </body>
